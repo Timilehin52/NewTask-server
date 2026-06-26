@@ -7,6 +7,8 @@ const {
   createTask,
   updateTask,
   deleteTask,
+  getTrashedTasks,
+  restoreTask,
 } = require("../Controllers/Taskcontroller");
 
 // All task routes require a valid JWT
@@ -17,5 +19,6 @@ router.get("/:id", getTask);
 router.post("/", createTask);
 router.put("/:id", updateTask);
 router.delete("/:id", deleteTask);
-
+router.get("/trash", getTrashedTasks);
+router.put("/trash/:id/restore", restoreTask);
 module.exports = router;

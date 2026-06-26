@@ -20,6 +20,10 @@ const taskSchema = new mongoose.Schema(
       enum: ["urgent", "important", "normal"],
       default: "normal",
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );
