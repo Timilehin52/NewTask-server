@@ -41,7 +41,7 @@ exports.updateTask = async (req, res) => {
   try {
     const { title, description, tag } = req.body;
     const task = await Task.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user._id },
+      { _id: req.params.id, userId: req.user._id, deletedAt:null},
       { title, description, tag: tag?.toLowerCase() },
       { new: true, runValidators: true }
     );
@@ -54,9 +54,41 @@ exports.updateTask = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
   try {
-    const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+    const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user._id, deletedAt:null },
+    { deletedAt: new Date() },
+      { new: true }
+    );
     if (!task) return res.status(404).json({ message: "Task not found" });
-    res.json({ message: "Task deleted" });
+    res.json({ message: "Task moved to trash", task });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+// GET all trashed tasks
+exports.getTrashedTasks = async (req, res) => {
+  try {
+    const tasks = await Task.find({
+      userId: req.user._id,
+      deletedAt: { $ne: null },
+    }).sort({ deletedAt: -1 });
+    res.json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// PUT restore a trashed task
+exports.restoreTask = async (req, res) => {
+  try {
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id, deletedAt: { $ne: null } },
+      { deletedAt: null },
+      { new: true }
+    );
+    if (!task) return res.status(404).json({ message: "Task not found in trash" });
+    res.json({ message: "Task restored", task });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

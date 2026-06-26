@@ -4,8 +4,8 @@
   "description": "TaskDuty backend API",
   "main": "Server.js",
   "scripts": {
-    "start": "node Server.js",
-    "dev": "nodemon Server.js"
+    "start": "node init && node Server.js",
+    "dev": "node init && nodemon Server.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
